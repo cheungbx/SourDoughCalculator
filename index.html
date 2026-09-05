@@ -60,6 +60,10 @@
       box-shadow: 0 0 10px rgba(245, 158, 11, 0.5);
       border: 2px solid #fff;
     }
+    input[type=range].water-slider::-webkit-slider-thumb {
+      background: #3b82f6;
+      box-shadow: 0 0 10px rgba(59, 130, 246, 0.5);
+    }
     @media print {
       body {
         background: white !important;
@@ -102,13 +106,14 @@
       <!-- Input Column -->
       <section class="lg:col-span-5 glass-card rounded-2xl p-6 shadow-2xl">
         <h2 class="font-serif text-xl font-semibold text-amber-200 mb-4 flex items-center gap-2 border-b border-amber-500/20 pb-3">
-          <i class="fa-solid fa-scale-balanced text-amber-400"></i> Flour Base (100%)
+          <i class="fa-solid fa-scale-balanced text-amber-400"></i> Recipe Parameters
         </h2>
 
         <div class="space-y-6">
+          <!-- Total Flour Input -->
           <div>
             <label for="flourInput" class="block text-sm font-medium text-amber-200/90 mb-2">
-              Total Flour Weight (grams)
+              Total Flour Weight (100%)
             </label>
             <div class="relative rounded-xl shadow-inner">
               <input 
@@ -125,7 +130,7 @@
             </div>
           </div>
 
-          <!-- Slider -->
+          <!-- Flour Weight Slider -->
           <div>
             <div class="flex justify-between text-xs text-amber-300/70 mb-1">
               <span>200g</span>
@@ -143,9 +148,33 @@
             />
           </div>
 
+          <!-- Water Hydration % Slider (60% to 90%, step 5%) -->
+          <div class="pt-2 border-t border-amber-500/20">
+            <div class="flex justify-between items-center mb-2">
+              <label for="waterSlider" class="text-sm font-medium text-blue-200 flex items-center gap-1.5">
+                <i class="fa-solid fa-droplet text-blue-400"></i> Water Hydration
+              </label>
+              <span id="waterPercentDisplay" class="text-base font-bold text-blue-300 bg-blue-950/80 px-2.5 py-0.5 rounded-md border border-blue-500/30">75%</span>
+            </div>
+            <input 
+              type="range" 
+              id="waterSlider" 
+              min="60" 
+              max="90" 
+              value="75" 
+              step="5"
+              class="w-full cursor-pointer water-slider"
+            />
+            <div class="flex justify-between text-xs text-blue-300/60 mt-1">
+              <span>60% (Stiff)</span>
+              <span>75% (Standard)</span>
+              <span>90% (High)</span>
+            </div>
+          </div>
+
           <!-- Quick Presets -->
-          <div>
-            <span class="block text-xs font-semibold uppercase tracking-wider text-amber-400/80 mb-2">Quick Presets</span>
+          <div class="pt-2 border-t border-amber-500/20">
+            <span class="block text-xs font-semibold uppercase tracking-wider text-amber-400/80 mb-2">Quick Flour Presets</span>
             <div class="grid grid-cols-4 gap-2">
               <button onclick="setFlour(400)" class="preset-btn px-2 py-2 rounded-lg bg-amber-900/40 hover:bg-amber-800/60 border border-amber-500/20 text-xs font-medium text-amber-200 transition-all hover:scale-105 active:scale-95">400g</button>
               <button onclick="setFlour(500)" class="preset-btn px-2 py-2 rounded-lg bg-amber-900/40 hover:bg-amber-800/60 border border-amber-500/20 text-xs font-medium text-amber-200 transition-all hover:scale-105 active:scale-95">500g</button>
@@ -238,20 +267,20 @@
             </div>
           </div>
 
-          <!-- Water -->
-          <div class="flex items-center justify-between p-3.5 rounded-xl bg-amber-950/40 border border-amber-500/10 hover:border-amber-500/30 transition-all">
+          <!-- Water (Adjustable 60% - 90%) -->
+          <div class="flex items-center justify-between p-3.5 rounded-xl bg-blue-950/30 border border-blue-500/20 hover:border-blue-500/40 transition-all">
             <div class="flex items-center gap-3">
-              <div class="w-10 h-10 rounded-lg bg-amber-500/10 border border-amber-500/20 flex items-center justify-center text-blue-400">
+              <div class="w-10 h-10 rounded-lg bg-blue-500/10 border border-blue-500/20 flex items-center justify-center text-blue-400">
                 <i class="fa-solid fa-droplet"></i>
               </div>
               <div>
                 <span class="block font-semibold text-amber-100">Water</span>
-                <span class="text-xs text-amber-300/60">Lukewarm (~28°C / 82°F)</span>
+                <span class="text-xs text-blue-200/60">Lukewarm (~28°C / 82°F)</span>
               </div>
             </div>
             <div class="text-right">
               <span id="waterGrams" class="text-2xl font-bold text-blue-300">375</span>
-              <span class="text-xs text-blue-400 font-medium block">75%</span>
+              <span id="waterPercentLabel" class="text-xs text-blue-400 font-medium block">75%</span>
             </div>
           </div>
 
@@ -385,6 +414,8 @@
     // DOM Elements
     const flourInput = document.getElementById('flourInput');
     const flourSlider = document.getElementById('flourSlider');
+    const waterSlider = document.getElementById('waterSlider');
+    const waterPercentDisplay = document.getElementById('waterPercentDisplay');
     const includeEnrichments = document.getElementById('includeEnrichments');
     const enrichmentsContainer = document.getElementById('enrichmentsContainer');
 
@@ -393,6 +424,7 @@
     const breadFlourGrams = document.getElementById('breadFlourGrams');
     const wholeWheatGrams = document.getElementById('wholeWheatGrams');
     const waterGrams = document.getElementById('waterGrams');
+    const waterPercentLabel = document.getElementById('waterPercentLabel');
     const saltGrams = document.getElementById('saltGrams');
     const sugarGrams = document.getElementById('sugarGrams');
     const oilGrams = document.getElementById('oilGrams');
@@ -401,11 +433,10 @@
     const copyBtnText = document.getElementById('copyBtnText');
 
     // Percentage Constants based on Flour (100%)
-    const PERCENTAGES = {
+    const BASE_PERCENTAGES = {
       starter: 0.25,     // 25%
       breadFlour: 0.75,  // 75%
       wholeWheat: 0.25,  // 25%
-      water: 0.75,       // 75%
       salt: 0.02,        // 2.0% standard
       sugar: 0.075,      // 7.5%
       oil: 0.05          // 5.0%
@@ -413,19 +444,26 @@
 
     function calculateRecipe() {
       let flourVal = parseFloat(flourInput.value);
-
       if (isNaN(flourVal) || flourVal <= 0) {
         flourVal = 0;
       }
 
-      // Calculations
-      const starter = flourVal * PERCENTAGES.starter;
-      const breadFlour = flourVal * PERCENTAGES.breadFlour;
-      const wholeWheat = flourVal * PERCENTAGES.wholeWheat;
-      const water = flourVal * PERCENTAGES.water;
-      const salt = flourVal * PERCENTAGES.salt;
-      const sugar = flourVal * PERCENTAGES.sugar;
-      const oil = flourVal * PERCENTAGES.oil;
+      // Water % from slider (60% - 90%, step 5%)
+      const waterPctVal = parseInt(waterSlider.value, 10) || 75;
+      const waterRatio = waterPctVal / 100;
+
+      // Update Water Percentage Displays
+      waterPercentDisplay.textContent = waterPctVal + '%';
+      waterPercentLabel.textContent = waterPctVal + '%';
+
+      // Ingredient Calculations
+      const starter = flourVal * BASE_PERCENTAGES.starter;
+      const breadFlour = flourVal * BASE_PERCENTAGES.breadFlour;
+      const wholeWheat = flourVal * BASE_PERCENTAGES.wholeWheat;
+      const water = flourVal * waterRatio;
+      const salt = flourVal * BASE_PERCENTAGES.salt;
+      const sugar = flourVal * BASE_PERCENTAGES.sugar;
+      const oil = flourVal * BASE_PERCENTAGES.oil;
 
       // Toggle Enrichments Visibility
       const isEnriched = includeEnrichments.checked;
@@ -453,7 +491,6 @@
     }
 
     function formatNumber(val) {
-      // Return neat format (no decimal trailing zeros if whole integer)
       return Number.isInteger(val) ? val : val.toFixed(1);
     }
 
@@ -474,11 +511,14 @@
       calculateRecipe();
     });
 
+    waterSlider.addEventListener('input', calculateRecipe);
+
     includeEnrichments.addEventListener('change', calculateRecipe);
 
     // Clipboard Copy Functionality
     function copyRecipe() {
       const flour = flourInput.value;
+      const waterPct = waterSlider.value;
       const isEnriched = includeEnrichments.checked;
 
       let recipeText = `🍞 SOURDOUGH BREAD RECIPE (${flour}g Total Flour Base)\n`;
@@ -486,7 +526,7 @@
       recipeText += `• Sourdough Starter (25%): ${starterGrams.textContent}g\n`;
       recipeText += `• Bread Flour (75%): ${breadFlourGrams.textContent}g\n`;
       recipeText += `• Whole Wheat Flour (25%): ${wholeWheatGrams.textContent}g\n`;
-      recipeText += `• Water (75%): ${waterGrams.textContent}g\n`;
+      recipeText += `• Water (${waterPct}%): ${waterGrams.textContent}g\n`;
       recipeText += `• Salt (2%): ${saltGrams.textContent}g\n`;
 
       if (isEnriched) {
@@ -498,7 +538,6 @@
       recipeText += `-----------------------------------------\n`;
       recipeText += `Total Dough Weight: ${totalDoughWeight.textContent}\n`;
 
-      // Copy text safely
       const textArea = document.createElement("textarea");
       textArea.value = recipeText;
       document.body.appendChild(textArea);
