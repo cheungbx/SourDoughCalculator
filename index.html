@@ -3,35 +3,30 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>酸種麵包配方計算器 | Sourdough Calculator</title>
-  <!-- Tailwind CSS CDN -->
+  <title>酸種麵包配方計算器 Sourdough Recipe Calculator</title>
+  <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
-  <!-- Google Fonts: Noto Serif TC & Inter -->
+  <!-- Font Awesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <!-- Google Fonts: Inter & Playfair Display -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Noto+Serif+TC:wght@400;600;700;900&display=swap" rel="stylesheet">
-  <!-- FontAwesome for Icons -->
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,600;0,700;1,400&display=swap" rel="stylesheet">
 
   <script>
     tailwind.config = {
       theme: {
         extend: {
           fontFamily: {
-            serif: ['"Noto Serif TC"', 'serif'],
             sans: ['Inter', 'sans-serif'],
+            serif: ['Playfair Display', 'serif'],
           },
           colors: {
-            amber: {
-              50: '#fffbebe6',
-              100: '#fef3c7',
-              800: '#92400e',
-              900: '#78350f',
-              950: '#451a03',
-            },
-            warmwood: '#2c1d11',
-            rust: '#b45309',
-            cream: '#fdfbf7',
+            warmwood: '#3e2723',
+            crust: '#8d6e63',
+            flour: '#fefae0',
+            crustgold: '#d4a373',
+            rust: '#bc4749',
           }
         }
       }
@@ -39,442 +34,381 @@
   </script>
 
   <style>
-    /* Custom background image overlay with high quality food aesthetics */
+    /* Background Image with Overlay */
     body {
-      font-family: 'Inter', 'Noto Serif TC', sans-serif;
-      background-color: #1a0f0a;
-      background-image: 
-        linear-gradient(to bottom, rgba(20, 10, 5, 0.78), rgba(35, 20, 10, 0.88)),
-        url('https://images.unsplash.com/photo-1509440159596-0249088772ff?q=80&w=1920&auto=format&fit=crop');
-      background-size: cover;
-      background-position: center;
-      background-attachment: fixed;
+      background: linear-gradient(rgba(30, 18, 12, 0.75), rgba(15, 8, 4, 0.85)), 
+                  url('https://images.unsplash.com/photo-1509440159596-0249088772ff?q=80&w=1920&auto=format&fit=crop') center/cover no-repeat fixed;
       min-height: 100vh;
     }
 
+    /* Glassmorphism Card Style */
     .glass-panel {
-      background: rgba(253, 251, 247, 0.94);
+      background: rgba(254, 250, 224, 0.94);
       backdrop-filter: blur(12px);
       -webkit-backdrop-filter: blur(12px);
-      border: 1px solid rgba(217, 119, 6, 0.2);
+      border: 1px solid rgba(212, 163, 115, 0.4);
     }
 
-    .glass-dark {
-      background: rgba(44, 29, 17, 0.85);
-      backdrop-filter: blur(8px);
-      border: 1px solid rgba(251, 191, 36, 0.2);
-    }
-
-    /* Custom Range Slider styling */
+    /* Custom Input Range Styling */
     input[type=range] {
-      -webkit-appearance: none;
-      width: 100%;
-      background: transparent;
-    }
-    input[type=range]:focus {
-      outline: none;
-    }
-    input[type=range]::-webkit-slider-runnable-track {
-      width: 100%;
-      height: 10px;
-      cursor: pointer;
-      background: #e5e7eb;
-      border-radius: 9999px;
-      border: 1px solid #d1d5db;
-    }
-    input[type=range]::-webkit-slider-thumb {
-      height: 24px;
-      width: 24px;
-      border-radius: 50%;
-      background: #b45309;
-      cursor: pointer;
-      -webkit-appearance: none;
-      margin-top: -7px;
-      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3), 0 0 0 3px rgba(251, 191, 36, 0.4);
-      transition: transform 0.1s ease, background-color 0.2s;
-    }
-    input[type=range]::-webkit-slider-thumb:hover {
-      transform: scale(1.15);
-      background: #d97706;
-    }
-    
-    /* Smooth card pulse on update */
-    .value-update {
-      animation: highlight 0.3s ease-out;
-    }
-    @keyframes highlight {
-      0% { color: #d97706; transform: scale(1.02); }
-      100% { color: inherit; transform: scale(1); }
+      accent-color: #8d6e63;
     }
   </style>
 </head>
-<body class="text-gray-800 antialiased p-3 sm:p-6 lg:p-10 flex flex-col justify-between">
+<body class="text-stone-800 font-sans p-3 sm:p-6 flex flex-col justify-between">
+
+  <!-- Language Switcher Bar -->
+  <div class="max-w-4xl mx-auto w-full mb-3 flex justify-between items-center">
+    <div class="text-amber-100/80 text-xs font-semibold tracking-wider flex items-center gap-1.5">
+      <i class="fa-solid fa-wheat-awn text-amber-400"></i>
+      <span data-i18n="appSubtitleHeader">ARTISAN BREAD UTILITY</span>
+    </div>
+
+    <!-- Language Selector Buttons -->
+    <div class="bg-amber-950/70 backdrop-blur-md p-1 rounded-xl border border-amber-500/30 text-xs font-medium flex items-center gap-1 shadow-lg">
+      <button 
+        type="button" 
+        id="langZhBtn" 
+        onclick="setLanguage('zh')" 
+        class="px-3 py-1 rounded-lg transition-all text-amber-100 bg-amber-700/80 shadow">
+        繁體中文
+      </button>
+      <button 
+        type="button" 
+        id="langEnBtn" 
+        onclick="setLanguage('en')" 
+        class="px-3 py-1 rounded-lg transition-all text-amber-300/70 hover:text-amber-100">
+        English
+      </button>
+    </div>
+  </div>
 
   <!-- Main Container -->
   <div class="max-w-4xl mx-auto w-full space-y-6">
 
-    <!-- Top Bar with Language Selector & Badge -->
-    <div class="flex justify-between items-center">
-      <div class="inline-flex items-center space-x-2 px-3 py-1 rounded-full bg-amber-950/70 border border-amber-500/30 text-amber-300 text-xs sm:text-sm tracking-wide">
-        <i class="fa-solid font-bold fa-fire-burner text-amber-400"></i>
-        <span data-i18n="badgeTag">手作烘焙黃金比例</span>
-      </div>
-
-      <!-- Language Selector Button Group -->
-      <div class="inline-flex rounded-xl bg-amber-950/80 p-1 border border-amber-500/30 shadow-lg text-xs font-semibold">
-        <button 
-          id="langZhBtn" 
-          onclick="setLanguage('zh')" 
-          class="px-3 py-1 rounded-lg transition-all text-amber-100 bg-amber-700/80 shadow">
-          中文
-        </button>
-        <button 
-          id="langEnBtn" 
-          onclick="setLanguage('en')" 
-          class="px-3 py-1 rounded-lg transition-all text-amber-300/70 hover:text-amber-100">
-          English
-        </button>
-      </div>
-    </div>
-
     <!-- Header Section -->
-    <header class="text-center space-y-3 pt-2">
-      <h1 data-i18n="mainTitle" class="text-3xl sm:text-5xl font-black font-serif text-amber-100 tracking-tight drop-shadow-lg">
-        酸種麵包計算器
-      </h1>
-      <p data-i18n="subTitle" class="text-amber-200/80 text-sm sm:text-base max-w-xl mx-auto font-light">
-        輕鬆計算完美的歐包與軟酸種麵包材料配比，精準掌控麵糰含水量
-      </p>
+    <header class="glass-panel rounded-3xl p-6 sm:p-8 text-center shadow-2xl relative overflow-hidden">
+      <div class="relative z-10">
+        <h1 class="text-3xl sm:text-4xl font-extrabold font-serif text-warmwood tracking-tight flex items-center justify-center gap-3">
+          <i class="fa-solid fa-bread-slice text-amber-700"></i>
+          <span data-i18n="appTitle">酸種麵包配方計算器</span>
+        </h1>
+        <p class="text-stone-600 text-sm sm:text-base mt-2 font-medium" data-i18n="appSubtitle">
+          黃金比例 • 精準水份 • 烘焙質感提升
+        </p>
+      </div>
     </header>
 
-    <!-- Main Grid Content -->
-    <main class="grid grid-cols-1 md:grid-cols-12 gap-6">
+    <!-- Interactive Calculator Card -->
+    <main class="glass-panel rounded-3xl p-5 sm:p-8 shadow-2xl space-y-8">
 
-      <!-- Left Column: Inputs & Controls (5 Cols) -->
-      <section class="md:col-span-5 space-y-6">
+      <!-- Inputs Control Panel -->
+      <section class="grid grid-cols-1 md:grid-cols-2 gap-6 bg-amber-100/50 rounded-2xl p-4 sm:p-6 border border-amber-200/80">
         
-        <!-- Input Card -->
-        <div class="glass-panel rounded-2xl p-5 sm:p-6 shadow-2xl">
-          <h2 class="text-lg font-bold font-serif text-warmwood border-b border-amber-200/80 pb-3 mb-5 flex items-center gap-2">
-            <i class="fa-solid fa-wheat-awn text-rust"></i> <span data-i18n="inputSectionTitle">麵粉總重與水份設置</span>
-          </h2>
-
-          <!-- Flour Input -->
-          <div class="space-y-2 mb-6">
-            <div class="flex justify-between items-center">
-              <label for="flourInput" class="text-sm font-semibold text-gray-700">
-                <span data-i18n="flourLabel">總麵粉量</span> (g) <span class="text-xs text-amber-700 font-normal" data-i18n="flourBaseNote">[基準 100%]</span>
-              </label>
-              <span class="text-xs bg-amber-100 text-amber-800 px-2 py-0.5 rounded-full font-mono font-medium" data-i18n="baseBadge">基底</span>
-            </div>
-            <div class="relative rounded-xl shadow-sm">
-              <input 
-                type="number" 
-                id="flourInput" 
-                value="500" 
-                min="50" 
-                max="10000" 
-                step="10"
-                class="w-full text-2xl font-bold font-mono text-warmwood bg-white border border-amber-300 rounded-xl py-3 pl-4 pr-12 focus:ring-2 focus:ring-amber-500 focus:border-amber-500 outline-none transition-all"
-                placeholder="500"
-              />
-              <div class="absolute inset-y-0 right-0 pr-4 flex items-center pointer-events-none text-gray-400 font-semibold" data-i18n="gramUnit">
-                克 (g)
-              </div>
-            </div>
-            
-            <!-- Preset Buttons -->
-            <div class="flex gap-2 pt-1">
-              <button onclick="setFlour(300)" class="text-xs bg-amber-50 hover:bg-amber-100 text-amber-800 border border-amber-200 py-1 px-2.5 rounded-lg transition-colors" data-i18n="preset1">1顆 (300g)</button>
-              <button onclick="setFlour(500)" class="text-xs bg-amber-50 hover:bg-amber-100 text-amber-800 border border-amber-200 py-1 px-2.5 rounded-lg transition-colors" data-i18n="preset2">標準 (500g)</button>
-              <button onclick="setFlour(1000)" class="text-xs bg-amber-50 hover:bg-amber-100 text-amber-800 border border-amber-200 py-1 px-2.5 rounded-lg transition-colors" data-i18n="preset3">大份 (1000g)</button>
-            </div>
+        <!-- Total Flour Input & Preset Slider -->
+        <div class="space-y-4">
+          <div class="flex justify-between items-center">
+            <label for="flourInput" class="block font-bold text-warmwood text-base flex items-center gap-2">
+              <i class="fa-solid fa-weight-hanging text-amber-800"></i>
+              <span data-i18n="flourInputLabel">總麵粉量 (Total Flour)</span>
+            </label>
+            <span class="text-xs bg-amber-200 text-amber-900 px-2 py-0.5 rounded-full font-bold">100%</span>
+          </div>
+          
+          <!-- Direct Numeric Input Box -->
+          <div class="relative">
+            <input 
+              type="number" 
+              id="flourInput" 
+              value="500" 
+              min="100" 
+              max="5000" 
+              step="10"
+              oninput="syncFlourFromInput()"
+              class="w-full bg-white/90 border-2 border-amber-300 rounded-xl py-3 px-4 text-warmwood font-bold text-xl focus:outline-none focus:border-amber-700 focus:ring-2 focus:ring-amber-700/20 shadow-sm transition-all"
+            />
+            <span class="absolute right-4 top-1/2 -translate-y-1/2 text-gray-500 font-bold text-sm">克 (g)</span>
           </div>
 
-          <!-- Water Hydration Slider -->
-          <div class="space-y-3 pt-2">
-            <div class="flex justify-between items-center">
-              <label for="waterSlider" class="text-sm font-semibold text-gray-700 flex items-center gap-1.5">
-                <i class="fa-solid fa-droplet text-blue-500"></i> <span data-i18n="hydrationLabel">水份比例 (Hydration)</span>
-              </label>
-              <span id="waterPercentDisplay" class="text-base font-bold font-mono text-rust bg-amber-100 px-2.5 py-0.5 rounded-lg border border-amber-300/60">
-                65%
-              </span>
+          <!-- Common Flour Preset Slider -->
+          <div class="space-y-1.5 pt-1">
+            <div class="flex justify-between text-xs text-stone-600 font-semibold">
+              <span data-i18n="flourSliderLabel">常見麵粉量選擇</span>
+              <span id="flourSliderDisplay" class="text-amber-900 font-bold">500g</span>
             </div>
+            <input 
+              type="range" 
+              id="flourSlider" 
+              min="0" 
+              max="9" 
+              step="1" 
+              value="3" 
+              oninput="syncFlourFromSlider(this.value)"
+              class="w-full h-2 bg-amber-200 rounded-lg appearance-none cursor-pointer accent-amber-800"
+            />
+            <div class="flex justify-between text-[10px] text-stone-500 font-medium px-0.5">
+              <span>200g</span>
+              <span>500g</span>
+              <span>1000g</span>
+              <span>1500g</span>
+            </div>
+          </div>
+        </div>
 
+        <!-- Hydration Slider Input -->
+        <div class="space-y-3 flex flex-col justify-between">
+          <div class="flex justify-between items-center">
+            <label for="waterSlider" class="block font-bold text-warmwood text-base flex items-center gap-2">
+              <i class="fa-solid fa-droplet text-blue-600"></i>
+              <span data-i18n="hydrationLabel">水份比例 (Hydration)</span>
+            </label>
+            <span id="waterPercentDisplay" class="text-base font-extrabold text-blue-800 bg-blue-100 px-3 py-0.5 rounded-full border border-blue-200">
+              65%
+            </span>
+          </div>
+          
+          <div class="space-y-2 pt-2">
             <input 
               type="range" 
               id="waterSlider" 
               min="60" 
               max="90" 
               step="5" 
-              value="65"
-              class="w-full cursor-pointer accent-amber-700"
+              value="65" 
+              oninput="calculateRecipe()"
+              class="w-full h-3 bg-blue-100 rounded-lg appearance-none cursor-pointer accent-blue-700"
             />
-
-            <div class="flex justify-between text-[11px] text-gray-500 font-mono px-1">
-              <span data-i18n="hydNote1">60% (好操作)</span>
-              <span data-i18n="hydNote2">75% (經典高水)</span>
-              <span data-i18n="hydNote3">90% (極致大孔洞)</span>
+            <div class="flex justify-between text-xs text-stone-600 font-semibold px-1">
+              <span>60% (較剛硬)</span>
+              <span>65% (推薦)</span>
+              <span>75% (多孔)</span>
+              <span>90% (極高水)</span>
             </div>
           </div>
 
-          <!-- Softening Ingredients Toggle Button -->
-          <div class="mt-6 pt-5 border-t border-amber-200/80">
-            <div class="flex items-center justify-between bg-amber-100/50 p-3.5 rounded-xl border border-amber-200">
-              <div class="pr-2">
-                <label for="softenerToggle" class="text-sm font-bold text-warmwood flex items-center gap-1.5 cursor-pointer" data-i18n="softenerToggleLabel">
-                  <i class="fa-solid fa-cookie-bite text-rust"></i> 加入軟化材料
-                </label>
-                <p class="text-[11px] text-gray-600" data-i18n="softenerToggleSub">加入天然糖/蜂蜜與油脂提升麵包柔軟度</p>
-              </div>
-              <button 
-                type="button" 
-                id="softenerToggleBtn"
-                onclick="toggleSofteners()"
-                class="relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent bg-gray-300 transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-amber-500 focus:ring-offset-2"
-                role="switch" 
-                aria-checked="false">
-                <span 
-                  id="softenerToggleDot"
-                  class="pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out translate-x-0">
-                </span>
-              </button>
-            </div>
+          <!-- Softening Materials Toggle Button -->
+          <div class="pt-2">
+            <button 
+              type="button" 
+              id="softenerToggleBtn" 
+              onclick="toggleSofteners()" 
+              class="w-full py-2.5 px-4 rounded-xl font-bold text-xs flex items-center justify-between transition-all bg-amber-800 text-amber-50 shadow-md hover:bg-amber-900">
+              <span class="flex items-center gap-2">
+                <i class="fa-solid fa-cookie text-amber-300"></i>
+                <span id="softenerToggleText" data-i18n="softenerToggleOn">已加入軟化口感材料 (糖/蜂蜜 & 油)</span>
+              </span>
+              <span class="bg-amber-950/40 px-2 py-0.5 rounded-md text-[11px]" data-i18n="toggleActionBtn">按此切換</span>
+            </button>
           </div>
         </div>
 
-        <!-- Sourdough Knowledge Tip Card -->
-        <div class="glass-dark text-amber-100 rounded-2xl p-5 shadow-xl space-y-3 text-xs leading-relaxed border border-amber-500/20">
-          <div class="flex items-center gap-2 text-amber-400 font-semibold text-sm">
-            <i class="fa-solid fa-lightbulb"></i> <span data-i18n="tipsTitle">酸種小貼士</span>
-          </div>
-          <p class="text-amber-200/90" data-i18n="tipsContent">
-            • <strong>酵母比例 (25%)：</strong> 採用標準烘焙百分比計算。<br>
-            • <strong>麵粉組合：</strong> 75% 高筋麵包麵粉能構建強健的麵筋結構；25% 全麥麵粉可賦予深厚的麥香與風味。<br>
-            • <strong>軟化成分：</strong> 若希望製作吐司或軟歐包，可加入糖與油脂，延長保濕度與柔軟度。
-          </p>
-        </div>
       </section>
 
-      <!-- Right Column: Recipe Output Display (7 Cols) -->
-      <section class="md:col-span-7 space-y-6">
+      <!-- Recipe Ingredients Breakdown Table -->
+      <section class="space-y-4">
+        <h2 class="text-xl font-bold font-serif text-warmwood border-b border-amber-200 pb-2 flex items-center justify-between">
+          <span><i class="fa-solid fa-list-check text-amber-800 mr-2"></i><span data-i18n="recipeTitle">配方詳細重量 (Recipe Breakdown)</span></span>
+          <span class="text-xs font-sans text-stone-500 font-normal" data-i18n="autoCalcNote">即時動態計算</span>
+        </h2>
 
-        <!-- Recipe Card -->
-        <div class="glass-panel rounded-2xl p-5 sm:p-6 shadow-2xl flex flex-col justify-between">
-          
-          <div>
-            <!-- Card Header -->
-            <div class="flex justify-between items-center border-b border-amber-200/80 pb-4 mb-5">
-              <div>
-                <h2 class="text-xl font-bold font-serif text-warmwood flex items-center gap-2">
-                  <i class="fa-solid fa-clipboard-list text-rust"></i> <span data-i18n="recipeTitle">酸種麵包食譜清單</span>
-                </h2>
-                <p class="text-xs text-gray-500 mt-0.5" data-i18n="recipeSubTitle">Sourdough Bread Recipe</p>
-              </div>
-              <button 
-                onclick="copyRecipe()" 
-                id="copyBtn"
-                class="inline-flex items-center gap-1.5 text-xs bg-amber-800 hover:bg-amber-900 text-amber-50 font-medium py-2 px-3.5 rounded-xl transition-all shadow-md active:scale-95">
-                <i class="fa-regular fa-copy"></i> <span id="copyBtnText" data-i18n="copyBtnText">複製食譜與烘焙指南</span>
-              </button>
-            </div>
-
-            <!-- Base Ingredients Table/List -->
-            <div class="space-y-3">
-              <div class="text-xs font-bold text-amber-900 uppercase tracking-wider mb-2 flex items-center gap-1">
-                <i class="fa-solid fa-bread-slice text-amber-600"></i> <span data-i18n="basicIngrTitle">主麵糰基本配方</span>
-              </div>
-
-              <!-- Sourdough Starter -->
-              <div class="flex items-center justify-between p-3.5 rounded-xl bg-amber-50/70 border border-amber-200/60 hover:bg-amber-100/50 transition-colors">
-                <div class="flex items-center gap-3">
-                  <div class="w-9 h-9 rounded-lg bg-amber-200/70 flex items-center justify-center text-amber-900 font-bold text-sm">
-                    <i class="fa-solid fa-jar"></i>
-                  </div>
-                  <div>
-                    <div class="font-bold text-gray-800 text-sm" data-i18n="starterName">酸種酵母</div>
-                    <div class="text-[11px] text-amber-800" data-i18n="starterRatio">比例: 25%</div>
-                  </div>
-                </div>
-                <div class="text-right">
-                  <span id="starterGrams" class="text-xl font-bold font-mono text-warmwood">125</span>
-                  <span class="text-xs text-gray-600 font-medium">g</span>
-                </div>
-              </div>
+        <div class="overflow-x-auto">
+          <table class="w-full text-left border-collapse">
+            <thead>
+              <tr class="text-xs font-bold uppercase tracking-wider text-stone-500 border-b border-amber-200/80">
+                <th class="py-3 px-3" data-i18n="colIngredient">材料名稱</th>
+                <th class="py-3 px-3 text-center" data-i18n="colPercentage">百分比 (%)</th>
+                <th class="py-3 px-3 text-right" data-i18n="colWeight">重量 (g)</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-amber-100 font-medium text-sm">
+              
+              <!-- Starter -->
+              <tr class="hover:bg-amber-50/60 transition-colors">
+                <td class="py-3 px-3 flex items-center gap-2.5">
+                  <span class="w-3 h-3 rounded-full bg-amber-600 inline-block"></span>
+                  <span data-i18n="ingStarter">酸種酵母 (Sourdough Starter)</span>
+                </td>
+                <td class="py-3 px-3 text-center font-semibold text-amber-900">25 %</td>
+                <td class="py-3 px-3 text-right font-bold text-warmwood text-base"><span id="starterGrams">125</span> g</td>
+              </tr>
 
               <!-- Bread Flour -->
-              <div class="flex items-center justify-between p-3.5 rounded-xl bg-amber-50/70 border border-amber-200/60 hover:bg-amber-100/50 transition-colors">
-                <div class="flex items-center gap-3">
-                  <div class="w-9 h-9 rounded-lg bg-amber-200/70 flex items-center justify-center text-amber-900 font-bold text-sm">
-                    <i class="fa-solid fa-wheat-awn"></i>
-                  </div>
-                  <div>
-                    <div class="font-bold text-gray-800 text-sm" data-i18n="breadFlourName">高筋麵包麵粉</div>
-                    <div class="text-[11px] text-amber-800" data-i18n="breadFlourRatio">比例: 75%</div>
-                  </div>
-                </div>
-                <div class="text-right">
-                  <span id="breadFlourGrams" class="text-xl font-bold font-mono text-warmwood">375</span>
-                  <span class="text-xs text-gray-600 font-medium">g</span>
-                </div>
-              </div>
+              <tr class="hover:bg-amber-50/60 transition-colors">
+                <td class="py-3 px-3 flex items-center gap-2.5">
+                  <span class="w-3 h-3 rounded-full bg-amber-400 inline-block"></span>
+                  <span data-i18n="ingBreadFlour">高筋麵包麵粉 (Bread Flour)</span>
+                </td>
+                <td class="py-3 px-3 text-center font-semibold text-amber-900">75 %</td>
+                <td class="py-3 px-3 text-right font-bold text-warmwood text-base"><span id="breadFlourGrams">375</span> g</td>
+              </tr>
 
               <!-- Whole Wheat Flour -->
-              <div class="flex items-center justify-between p-3.5 rounded-xl bg-amber-50/70 border border-amber-200/60 hover:bg-amber-100/50 transition-colors">
-                <div class="flex items-center gap-3">
-                  <div class="w-9 h-9 rounded-lg bg-amber-200/70 flex items-center justify-center text-amber-900 font-bold text-sm">
-                    <i class="fa-solid fa-seedling"></i>
-                  </div>
-                  <div>
-                    <div class="font-bold text-gray-800 text-sm" data-i18n="wholeWheatName">全麥麵粉</div>
-                    <div class="text-[11px] text-amber-800" data-i18n="wholeWheatRatio">比例: 25%</div>
-                  </div>
-                </div>
-                <div class="text-right">
-                  <span id="wholeWheatGrams" class="text-xl font-bold font-mono text-warmwood">125</span>
-                  <span class="text-xs text-gray-600 font-medium">g</span>
-                </div>
-              </div>
+              <tr class="hover:bg-amber-50/60 transition-colors">
+                <td class="py-3 px-3 flex items-center gap-2.5">
+                  <span class="w-3 h-3 rounded-full bg-amber-800 inline-block"></span>
+                  <span data-i18n="ingWholeWheat">全麥麵粉 (Whole Wheat Flour)</span>
+                </td>
+                <td class="py-3 px-3 text-center font-semibold text-amber-900">25 %</td>
+                <td class="py-3 px-3 text-right font-bold text-warmwood text-base"><span id="wholeWheatGrams">125</span> g</td>
+              </tr>
 
               <!-- Water -->
-              <div class="flex items-center justify-between p-3.5 rounded-xl bg-blue-50/70 border border-blue-200/60 hover:bg-blue-100/50 transition-colors">
-                <div class="flex items-center gap-3">
-                  <div class="w-9 h-9 rounded-lg bg-blue-200/70 flex items-center justify-center text-blue-900 font-bold text-sm">
-                    <i class="fa-solid fa-droplet text-blue-600"></i>
-                  </div>
+              <tr class="hover:bg-amber-50/60 transition-colors bg-blue-50/30">
+                <td class="py-3 px-3 flex items-center gap-2.5">
+                  <span class="w-3 h-3 rounded-full bg-blue-500 inline-block"></span>
                   <div>
-                    <div class="font-bold text-gray-800 text-sm" data-i18n="waterName">水</div>
-                    <div class="text-[11px] text-blue-800"><span data-i18n="waterRatioLabel">當前水份:</span> <span id="waterPercentTag">65%</span></div>
+                    <span data-i18n="ingWater">水量 (Water)</span>
+                    <span class="text-[11px] text-blue-700 font-bold block sm:inline sm:ml-1" data-i18n="waterDeductionNote">(計出的水量 - 20g 手沾水扣減)</span>
                   </div>
-                </div>
-                <div class="text-right">
-                  <span id="waterGrams" class="text-xl font-bold font-mono text-blue-900">325</span>
-                  <span class="text-xs text-gray-600 font-medium">g</span>
-                </div>
-              </div>
+                </td>
+                <td class="py-3 px-3 text-center font-semibold text-blue-800" id="waterTablePercent">65 %</td>
+                <td class="py-3 px-3 text-right font-bold text-blue-900 text-base"><span id="waterGrams">305</span> g</td>
+              </tr>
 
               <!-- Salt -->
-              <div class="flex items-center justify-between p-3.5 rounded-xl bg-amber-50/70 border border-amber-200/60 hover:bg-amber-100/50 transition-colors">
-                <div class="flex items-center gap-3">
-                  <div class="w-9 h-9 rounded-lg bg-amber-200/70 flex items-center justify-center text-amber-900 font-bold text-sm">
-                    <i class="fa-solid fa-cubes-stacked"></i>
-                  </div>
-                  <div>
-                    <div class="font-bold text-gray-800 text-sm" data-i18n="saltName">鹽</div>
-                    <div class="text-[11px] text-amber-800" data-i18n="saltRatio">比例: 2.0%</div>
-                  </div>
-                </div>
-                <div class="text-right">
-                  <span id="saltGrams" class="text-xl font-bold font-mono text-warmwood">10</span>
-                  <span class="text-xs text-gray-600 font-medium">g</span>
-                </div>
-              </div>
+              <tr class="hover:bg-amber-50/60 transition-colors">
+                <td class="py-3 px-3 flex items-center gap-2.5">
+                  <span class="w-3 h-3 rounded-full bg-gray-400 inline-block"></span>
+                  <span data-i18n="ingSalt">海鹽 / 食鹽 (Salt)</span>
+                </td>
+                <td class="py-3 px-3 text-center font-semibold text-amber-900">2.0 %</td>
+                <td class="py-3 px-3 text-right font-bold text-warmwood text-base"><span id="saltGrams">10</span> g</td>
+              </tr>
 
-            </div>
+            </tbody>
+          </table>
+        </div>
 
-            <!-- Softener Optional Ingredients Section -->
-            <div id="softenerSection" class="hidden mt-6 pt-5 border-t border-dashed border-amber-300/80 space-y-3">
-              <div class="flex items-center justify-between mb-2">
-                <div class="text-xs font-bold text-amber-900 uppercase tracking-wider flex items-center gap-1.5">
-                  <i class="fa-solid fa-wand-magic-sparkles text-amber-600"></i> <span data-i18n="softenerTitle">軟化口感選配食材</span> <span class="text-[10px] font-normal text-gray-500 font-sans" data-i18n="softenerSub">(使麵包更軟糯)</span>
-                </div>
-              </div>
-
-              <!-- Sugar / Honey -->
-              <div class="flex items-center justify-between p-3 rounded-xl bg-orange-50/50 border border-orange-200/50">
-                <div class="flex items-center gap-3">
-                  <div class="w-8 h-8 rounded-lg bg-orange-100 flex items-center justify-center text-orange-700 text-xs font-bold">
-                    <i class="fa-solid fa-cube"></i>
-                  </div>
-                  <div>
-                    <div class="font-semibold text-gray-800 text-xs sm:text-sm" data-i18n="sugarName">天然糖或蜂蜜</div>
-                    <div class="text-[10px] text-gray-500" data-i18n="sugarRatio">比例: 7.5%</div>
-                  </div>
-                </div>
-                <div class="text-right">
-                  <span id="sugarGrams" class="text-lg font-bold font-mono text-amber-900">37.5</span>
-                  <span class="text-xs text-gray-500">g</span>
-                </div>
-              </div>
-
-              <!-- Oil / Fat -->
-              <div class="flex items-center justify-between p-3 rounded-xl bg-orange-50/50 border border-orange-200/50">
-                <div class="flex items-center gap-3">
-                  <div class="w-8 h-8 rounded-lg bg-orange-100 flex items-center justify-center text-orange-700 text-xs font-bold">
-                    <i class="fa-solid fa-bottle-droplet"></i>
-                  </div>
-                  <div>
-                    <div class="font-semibold text-gray-800 text-xs sm:text-sm" data-i18n="oilName">油脂 (植物油或奶油)</div>
-                    <div class="text-[10px] text-gray-500" data-i18n="oilRatio">比例: 5.0%</div>
-                  </div>
-                </div>
-                <div class="text-right">
-                  <span id="oilGrams" class="text-lg font-bold font-mono text-amber-900">25.0</span>
-                  <span class="text-xs text-gray-500">g</span>
-                </div>
-              </div>
-
-            </div>
+        <!-- Optional Softeners Section (Togglable) -->
+        <div id="softenerSection" class="bg-amber-50/90 rounded-2xl p-4 border border-amber-300/80 space-y-3">
+          <div class="text-xs font-bold text-amber-900 uppercase tracking-wide flex items-center gap-2">
+            <i class="fa-solid fa-heart text-rust"></i>
+            <span data-i18n="softenerHeader">軟化口感選配成分 (Add for Softer Bread)</span>
           </div>
 
-          <!-- Total Summary Footer -->
-          <div class="mt-6 pt-4 border-t border-amber-200 flex items-center justify-between text-warmwood bg-amber-100/70 p-3.5 rounded-xl">
-            <div class="text-xs sm:text-sm font-semibold flex items-center gap-2">
-              <i class="fa-solid fa-scale-balanced text-rust"></i> <span data-i18n="totalDoughLabel">麵糰預估總重量</span>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
+            <div class="flex justify-between items-center bg-white/80 p-3 rounded-xl border border-amber-200">
+              <span class="text-xs font-semibold text-stone-700 flex items-center gap-2">
+                <i class="fa-solid fa-jar-wheat text-amber-600"></i>
+                <span data-i18n="ingSugar">天然糖 / 蜂蜜 (Sugar/Honey)</span>
+              </span>
+              <div class="text-right">
+                <span class="text-xs text-gray-500 block">7.5%</span>
+                <span class="font-bold text-amber-900"><span id="sugarGrams">38</span> g</span>
+              </div>
             </div>
-            <div class="text-right">
-              <span id="totalDoughWeight" class="text-2xl font-black font-mono text-rust">960</span>
-              <span class="text-xs font-semibold text-gray-700">g</span>
+
+            <div class="flex justify-between items-center bg-white/80 p-3 rounded-xl border border-amber-200">
+              <span class="text-xs font-semibold text-stone-700 flex items-center gap-2">
+                <i class="fa-solid fa-bottle-droplet text-amber-700"></i>
+                <span data-i18n="ingOil">植物油 / 奶油 (Oil/Butter)</span>
+              </span>
+              <div class="text-right">
+                <span class="text-xs text-gray-500 block">5.0%</span>
+                <span class="font-bold text-amber-900"><span id="oilGrams">25</span> g</span>
+              </div>
             </div>
           </div>
+        </div>
 
+        <!-- Total Weight Summary -->
+        <div class="bg-warmwood text-flour rounded-2xl p-4 flex justify-between items-center shadow-lg">
+          <span class="font-bold text-base flex items-center gap-2">
+            <i class="fa-solid fa-scale-balanced text-amber-400"></i>
+            <span data-i18n="totalDoughLabel">麵糰預估總重量</span>
+          </span>
+          <span class="text-2xl font-extrabold text-amber-300"><span id="totalDoughWeight" class="font-mono">983</span> g</span>
         </div>
 
       </section>
+
+      <!-- One-Click Copy Recipe Button -->
+      <button 
+        type="button" 
+        id="copyBtn"
+        onclick="copyRecipe()" 
+        class="w-full bg-amber-800 hover:bg-amber-900 text-amber-50 font-bold py-3.5 px-6 rounded-2xl shadow-xl transition-all duration-200 flex items-center justify-center gap-3 text-base">
+        <i class="fa-regular fa-copy text-lg"></i>
+        <span id="copyBtnText" data-i18n="copyBtnText">一鍵複製完整配方至剪貼簿</span>
+      </button>
 
     </main>
 
-    <!-- Dutch Oven Pre-heating and Baking Steps Section -->
+    <!-- Baking Steps Section (Dutch Oven / Pizza Stone / Air Fryer Selector) -->
     <section class="glass-panel rounded-2xl p-5 sm:p-7 shadow-2xl space-y-5 border-l-4 border-l-amber-700">
-      <div class="flex items-center justify-between border-b border-amber-200/80 pb-3">
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between border-b border-amber-200/80 pb-3 gap-3">
         <h2 class="text-xl font-bold font-serif text-warmwood flex items-center gap-2.5">
-          <i class="fa-solid fa-fire-flame-curved text-rust"></i> <span data-i18n="dutchGuideTitle">鑄鐵鍋預熱與烘焙指南</span>
+          <i class="fa-solid fa-fire-flame-curved text-rust"></i> <span data-i18n="bakingGuideTitle">烘焙指南與步驟</span>
         </h2>
-        <span class="text-xs bg-amber-200/80 text-amber-900 font-semibold px-2.5 py-1 rounded-full" data-i18n="dutchBadge">4步驟成功法</span>
+        
+        <!-- Baking Method Toggle Buttons -->
+        <div class="bg-amber-950/20 p-1 rounded-xl flex items-center gap-1 border border-amber-300 flex-wrap">
+          <button 
+            type="button" 
+            id="methodDutchBtn"
+            onclick="setBakingMethod('dutch')"
+            class="px-3 py-1.5 rounded-lg text-xs font-bold transition-all bg-amber-800 text-amber-50 shadow">
+            <i class="fa-solid fa-dumpster mr-1"></i>
+            <span data-i18n="methodDutch">鑄鐵鍋</span>
+          </button>
+          <button 
+            type="button" 
+            id="methodStoneBtn"
+            onclick="setBakingMethod('stone')"
+            class="px-3 py-1.5 rounded-lg text-xs font-bold transition-all text-amber-900 hover:bg-amber-200/60">
+            <i class="fa-solid fa-square-full mr-1"></i>
+            <span data-i18n="methodStone">披薩石板加鍋蓋</span>
+          </button>
+          <button 
+            type="button" 
+            id="methodAirFryerBtn"
+            onclick="setBakingMethod('airfryer')"
+            class="px-3 py-1.5 rounded-lg text-xs font-bold transition-all text-amber-900 hover:bg-amber-200/60">
+            <i class="fa-solid fa-wind mr-1"></i>
+            <span data-i18n="methodAirFryer">空氣炸鍋</span>
+          </button>
+          <button 
+            type="button" 
+            id="methodBreadMachineBtn"
+            onclick="setBakingMethod('breadmachine')"
+            class="px-3 py-1.5 rounded-lg text-xs font-bold transition-all text-amber-900 hover:bg-amber-200/60">
+            <i class="fa-solid fa-kitchen-set mr-1"></i>
+            <span data-i18n="methodBreadMachine">麵包機</span>
+          </button>
+        </div>
       </div>
 
       <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         
         <!-- Step 1: Pre-heating -->
-        <div class="bg-amber-50/80 rounded-xl p-4 border border-amber-200/70 space-y-2 relative overflow-hidden">
+        <div class="bg-amber-50/80 rounded-xl p-4 border border-amber-200/70 space-y-2">
           <div class="text-xs font-bold text-amber-800 uppercase tracking-wide flex items-center gap-1.5">
             <span class="bg-amber-800 text-white w-5 h-5 rounded-full flex items-center justify-center text-[10px]">1</span> <span data-i18n="step1Header">預熱階段</span>
           </div>
-          <h3 class="font-bold text-warmwood text-sm" data-i18n="step1Title">鑄鐵鍋連蓋預熱</h3>
-          <p class="text-xs text-gray-600 leading-relaxed" data-i18n="step1Desc">
+          <h3 class="font-bold text-warmwood text-sm" id="step1Title" data-i18n="step1TitleDutch">鑄鐵鍋連蓋預熱</h3>
+          <p class="text-xs text-gray-600 leading-relaxed" id="step1Desc" data-i18n="step1DescDutch">
             將鑄鐵鍋（含蓋）放入烤箱中層，預熱至 <strong class="text-amber-900">230°C–250°C (450°F–480°F)</strong>，預熱至少 <strong class="text-amber-900">45–60 分鐘</strong>，確保蓄熱充足。
           </p>
         </div>
 
-        <!-- Step 2: Lidded Baking -->
+        <!-- Step 2: Covered Baking -->
         <div class="bg-amber-50/80 rounded-xl p-4 border border-amber-200/70 space-y-2">
           <div class="text-xs font-bold text-amber-800 uppercase tracking-wide flex items-center gap-1.5">
             <span class="bg-amber-800 text-white w-5 h-5 rounded-full flex items-center justify-center text-[10px]">2</span> <span data-i18n="step2Header">有蓋烘烤 (蒸汽膨脹)</span>
           </div>
-          <h3 class="font-bold text-warmwood text-sm" data-i18n="step2Title">割紋與入鍋 (20分鐘)</h3>
-          <p class="text-xs text-gray-600 leading-relaxed" data-i18n="step2Desc">
+          <h3 class="font-bold text-warmwood text-sm" id="step2Title" data-i18n="step2TitleDutch">割紋與入鍋 (20分鐘)</h3>
+          <p class="text-xs text-gray-600 leading-relaxed" id="step2Desc" data-i18n="step2DescDutch">
             麵糰割紋後鋪烘焙紙放入熱鍋，可放入1-2顆冰塊增強蒸汽。蓋上鍋蓋在 <strong class="text-amber-900">230°C (450°F)</strong> 烘烤 <strong class="text-amber-900">20 分鐘</strong> 以達成最佳耳朵與爆口。
           </p>
         </div>
 
-        <!-- Step 3: Unlidded Baking -->
+        <!-- Step 3: Uncovered Baking -->
         <div class="bg-amber-50/80 rounded-xl p-4 border border-amber-200/70 space-y-2">
           <div class="text-xs font-bold text-amber-800 uppercase tracking-wide flex items-center gap-1.5">
             <span class="bg-amber-800 text-white w-5 h-5 rounded-full flex items-center justify-center text-[10px]">3</span> <span data-i18n="step3Header">無蓋烘烤 (上色立體)</span>
           </div>
-          <h3 class="font-bold text-warmwood text-sm" data-i18n="step3Title">開蓋烤脆皮 (20-25分鐘)</h3>
-          <p class="text-xs text-gray-600 leading-relaxed" data-i18n="step3Desc">
+          <h3 class="font-bold text-warmwood text-sm" id="step3Title" data-i18n="step3TitleDutch">開蓋烤脆皮 (20-25分鐘)</h3>
+          <p class="text-xs text-gray-600 leading-relaxed" id="step3Desc" data-i18n="step3DescDutch">
             小心打開鍋蓋，將溫度調降至 <strong class="text-amber-900">200°C–210°C (400°F–410°F)</strong> 續烤 <strong class="text-amber-900">20–25 分鐘</strong>，直至外皮呈現深琥珀金黃色。
           </p>
         </div>
@@ -484,8 +418,8 @@
           <div class="text-xs font-bold text-amber-800 uppercase tracking-wide flex items-center gap-1.5">
             <span class="bg-amber-800 text-white w-5 h-5 rounded-full flex items-center justify-center text-[10px]">4</span> <span data-i18n="step4Header">冷卻定型</span>
           </div>
-          <h3 class="font-bold text-warmwood text-sm" data-i18n="step4Title">涼架靜置切片</h3>
-          <p class="text-xs text-gray-600 leading-relaxed" data-i18n="step4Desc">
+          <h3 class="font-bold text-warmwood text-sm" id="step4Title" data-i18n="step4TitleDutch">涼架靜置切片</h3>
+          <p class="text-xs text-gray-600 leading-relaxed" id="step4Desc" data-i18n="step4DescDutch">
             出爐後移至金屬網架靜置 <strong class="text-amber-900">1–2 小時以上</strong>，待內部水汽完全穩定凝固後再切片，組織才會鬆軟不黏手。
           </p>
         </div>
@@ -493,8 +427,8 @@
       </div>
     </section>
 
-    <!-- Footer Toast Message -->
-    <footer class="text-center text-amber-200/60 text-xs py-4 space-y-1">
+    <!-- Footer -->
+    <footer class="text-center text-amber-200/70 text-xs py-3">
       <p data-i18n="footerText">© 酸種麵包助手 Sourdough Companion • 精準手作烘焙工具</p>
     </footer>
 
@@ -505,142 +439,276 @@
     // Internationalization (i18n) Dictionaries
     const i18n = {
       zh: {
-        badgeTag: "手作烘焙黃金比例",
-        mainTitle: "酸種麵包計算器",
-        subTitle: "輕鬆計算完美的歐包與軟酸種麵包材料配比，精準掌控麵糰含水量",
-        inputSectionTitle: "麵粉總重與水份設置",
-        flourLabel: "總麵粉量",
-        flourBaseNote: "[基準 100%]",
-        baseBadge: "基底",
-        gramUnit: "克 (g)",
-        preset1: "1顆 (300g)",
-        preset2: "標準 (500g)",
-        preset3: "大份 (1000g)",
+        appSubtitleHeader: "ARTISAN BREAD UTILITY",
+        appTitle: "酸種麵包配方計算器",
+        appSubtitle: "黃金比例 • 精準水份 • 烘焙質感提升",
+        flourInputLabel: "總麵粉量 (Total Flour)",
+        flourSliderLabel: "常見麵粉量選擇",
         hydrationLabel: "水份比例 (Hydration)",
-        hydNote1: "60% (好操作)",
-        hydNote2: "75% (經典高水)",
-        hydNote3: "90% (極致大孔洞)",
-        softenerToggleLabel: '<i class="fa-solid fa-cookie-bite text-rust"></i> 加入軟化材料',
-        softenerToggleSub: "加入天然糖/蜂蜜與油脂提升麵包柔軟度",
-        tipsTitle: "酸種小貼士",
-        tipsContent: "• <strong>酵母比例 (25%)：</strong> 採用標準烘焙百分比計算。<br>• <strong>麵粉組合：</strong> 75% 高筋麵包麵粉能構建強健的麵筋結構；25% 全麥麵粉可賦予深厚的麥香與風味。<br>• <strong>軟化成分：</strong> 若希望製作吐司或軟歐包，可加入糖與油脂，延長保濕度與柔軟度。",
-        recipeTitle: "酸種麵包食譜清單",
-        recipeSubTitle: "Sourdough Bread Recipe",
-        copyBtnText: "複製食譜與烘焙指南",
-        copiedBtnText: "已複製！",
-        basicIngrTitle: "主麵糰基本配方 (Basic Ingredients)",
-        starterName: "酸種酵母 <span class=\"text-xs font-normal text-gray-500\">Sourdough Starter</span>",
-        starterRatio: "比例: 25%",
-        breadFlourName: "高筋麵包麵粉 <span class=\"text-xs font-normal text-gray-500\">Bread Flour</span>",
-        breadFlourRatio: "比例: 75%",
-        wholeWheatName: "全麥麵粉 <span class=\"text-xs font-normal text-gray-500\">Whole Wheat Flour</span>",
-        wholeWheatRatio: "比例: 25%",
-        waterName: "水 <span class=\"text-xs font-normal text-gray-500\">Water</span>",
-        waterRatioLabel: "當前水份:",
-        saltName: "鹽 <span class=\"text-xs font-normal text-gray-500\">Salt</span>",
-        saltRatio: "比例: 2.0%",
-        softenerTitle: "軟化口感選配食材",
-        softenerSub: "(使麵包更軟糯)",
-        sugarName: "天然糖或蜂蜜 <span class=\"text-[11px] text-gray-500\">Sugar / Honey</span>",
-        sugarRatio: "比例: 7.5%",
-        oilName: "油脂 <span class=\"text-[11px] text-gray-500\">(植物油或奶油 Oil / Fat)</span>",
-        oilRatio: "比例: 5.0%",
+        softenerToggleOn: "已加入軟化口感材料 (糖/蜂蜜 & 油)",
+        softenerToggleOff: "已關閉軟化口感材料 (點擊加入)",
+        toggleActionBtn: "按此切換",
+        recipeTitle: "配方詳細重量 (Recipe Breakdown)",
+        autoCalcNote: "即時動態計算",
+        colIngredient: "材料名稱",
+        colPercentage: "百分比 (%)",
+        colWeight: "重量 (g)",
+        ingStarter: "酸種酵母 (Sourdough Starter)",
+        ingBreadFlour: "高筋麵包麵粉 (Bread Flour)",
+        ingWholeWheat: "全麥麵粉 (Whole Wheat Flour)",
+        ingWater: "水量 (Water)",
+        waterDeductionNote: "(計出的水量 - 20g 手沾水扣減)",
+        ingSalt: "海鹽 / 食鹽 (Salt)",
+        softenerHeader: "軟化口感選配成分 (Add for Softer Bread)",
+        ingSugar: "天然糖 / 蜂蜜 (Sugar/Honey)",
+        ingOil: "植物油 / 奶油 (Oil/Butter)",
         totalDoughLabel: "麵糰預估總重量",
-        dutchGuideTitle: "鑄鐵鍋預熱與烘焙指南 (Dutch Oven Guide)",
-        dutchBadge: "4步驟成功法",
+        copyBtnText: "一鍵複製完整配方至剪貼簿",
+        copiedBtnText: "✓ 已成功複製配方！",
+        bakingGuideTitle: "烘焙指南與步驟",
+        methodDutch: "鑄鐵鍋",
+        methodStone: "披薩石板加鍋蓋",
+        methodAirFryer: "空氣炸鍋",
+        methodBreadMachine: "麵包機",
         step1Header: "預熱階段",
-        step1Title: "鑄鐵鍋連蓋預熱",
-        step1Desc: '將鑄鐵鍋（含蓋）放入烤箱中層，預熱至 <strong class="text-amber-900">230°C–250°C (450°F–480°F)</strong>，預熱至少 <strong class="text-amber-900">45–60 分鐘</strong>，確保蓄熱充足。',
+        step1TitleDutch: "鑄鐵鍋連蓋預熱",
+        step1DescDutch: '將鑄鐵鍋（含蓋）放入烤箱中層，預熱至 <strong class="text-amber-900">230°C–250°C (450°F–480°F)</strong>，預熱至少 <strong class="text-amber-900">45–60 分鐘</strong>，確保蓄熱充足。',
         step2Header: "有蓋烘烤 (蒸汽膨脹)",
-        step2Title: "割紋與入鍋 (20分鐘)",
-        step2Desc: '麵糰割紋後鋪烘焙紙放入熱鍋，可放入1-2顆冰塊增強蒸汽。蓋上鍋蓋在 <strong class="text-amber-900">230°C (450°F)</strong> 烘烤 <strong class="text-amber-900">20 分鐘</strong> 以達成最佳耳朵與爆口。',
+        step2TitleDutch: "割紋與入鍋 (20分鐘)",
+        step2DescDutch: '麵糰割紋後鋪烘焙紙放入熱鍋，可放入1-2顆冰塊增強蒸汽。蓋上鍋蓋在 <strong class="text-amber-900">230°C (450°F)</strong> 烘烤 <strong class="text-amber-900">20 分鐘</strong> 以達成最佳耳朵與爆口。',
         step3Header: "無蓋烘烤 (上色立體)",
-        step3Title: "開蓋烤脆皮 (20-25分鐘)",
-        step3Desc: '小心打開鍋蓋，將溫度調降至 <strong class="text-amber-900">200°C–210°C (400°F–410°F)</strong> 續烤 <strong class="text-amber-900">20–25 分鐘</strong>，直至外皮呈現深琥珀金黃色。',
+        step3TitleDutch: "開蓋烤脆皮 (20-25分鐘)",
+        step3DescDutch: '小心打開鍋蓋，將溫度調降至 <strong class="text-amber-900">200°C–210°C (400°F–410°F)</strong> 續烤 <strong class="text-amber-900">20–25 分鐘</strong>，直至外皮呈現深琥珀金黃色。',
+        step1TitleStone: "石板與深鍋蓋預熱",
+        step1DescStone: '將披薩石板放在中下層，耐熱深金屬鍋/不鏽鋼盆蓋在石板上，預熱至 <strong class="text-amber-900">230°C–250°C (450°F–480°F)</strong> 至少 <strong class="text-amber-900">45–60 分鐘</strong>。',
+        step2TitleStone: "石板轉移與罩蓋 (20分鐘)",
+        step2DescStone: '將割紋後的麵糰用烘焙紙移至熱石板上，噴水或放置冰塊於石板邊緣，迅速蓋上高深金屬鍋蓋，在 <strong class="text-amber-900">230°C (450°F)</strong> 蒸烤 <strong class="text-amber-900">20 分鐘</strong>。',
+        step3TitleStone: "移開鍋蓋烤脆皮 (20-25分鐘)",
+        step3DescStone: '小心將深鍋蓋移開放一旁，溫度調降至 <strong class="text-amber-900">200°C–210°C (400°F–410°F)</strong>，繼續烘烤 <strong class="text-amber-900">20–25 分鐘</strong> 直至外皮酥脆金黃。',
+        step1TitleAirFryer: "氣炸鍋高溫預熱",
+        step1DescAirFryer: '空鍋預熱至最高溫 <strong class="text-amber-900">200°C (390°F)</strong> 運轉 <strong class="text-amber-900">10–15 分鐘</strong>。建議使用較小尺寸麵糰（總粉量 250g–350g）以符合氣炸鍋內部空間。',
+        step2TitleAirFryer: "拱形鋁箔罩蓋蒸烤 (20-25分鐘)",
+        step2DescAirFryer: '將割紋麵糰連同烘焙紙放進氣炸籃，表面噴水，並用金屬高深蓋子或高拱形錫紙包覆麵糰上方形成密封蒸汽空間。以 <strong class="text-amber-900">190°C–200°C</strong> 烘烤 <strong class="text-amber-900">20–25 分鐘</strong>。',
+        step3TitleAirFryer: "取下罩蓋上色烤脆 (15-20分鐘)",
+        step3DescAirFryer: '小心取下上層的錫紙罩或蓋子，將氣炸鍋溫度調至 <strong class="text-amber-900">170°C–180°C (340°F–350°F)</strong> 續烤 <strong class="text-amber-900">15–20 分鐘</strong>，直至麵麵頂部呈現琥珀金黃色。',
+        step1TitleBreadMachine: "攪拌與水合預備",
+        step1DescBreadMachine: '將所有材料放入麵包機內膽，使用「揉麵/自主攪拌」模式攪拌 <strong class="text-amber-900">10–15 分鐘</strong> 至形成均勻麵糰。若需完美組織，攪拌後可拆下攪拌葉片。',
+        step2TitleBreadMachine: "長效低溫發酵 (2-4小時)",
+        step2DescBreadMachine: '使用「酸種/天然酵母/發酵」模式，或關閉電源靜置發酵 <strong class="text-amber-900">2–4 小時</strong>（直至麵糰膨脹至 1.5 至 2 倍大）。',
+        step3TitleBreadMachine: "獨立烘烤模式 (35-45分鐘)",
+        step3DescBreadMachine: '選擇獨立「烘烤 (Bake Only)」模式，設置烤色為「深色/Heavy Crust」，烘烤 <strong class="text-amber-900">35–45 分鐘</strong> 至頂部呈金黃硬殼。',
         step4Header: "冷卻定型",
-        step4Title: "涼架靜置切片",
-        step4Desc: '出爐後移至金屬網架靜置 <strong class="text-amber-900">1–2 小時以上</strong>，待內部水汽完全穩定凝固後再切片，組織才會鬆軟不黏手。',
+        step4TitleDutch: "涼架靜置切片",
+        step4DescDutch: '出爐後移至金屬網架靜置 <strong class="text-amber-900">1–2 小時以上</strong>，待內部水汽完全穩定凝固後再切片，組織才會鬆軟不黏手。',
         footerText: "© 酸種麵包助手 Sourdough Companion • 精準手作烘焙工具",
         copyTitleText: "【酸種麵包食譜】",
         copyFlourBase: "總麵粉基數",
         copySoftenerHeader: "[軟化口感選配成分]",
         copyTotalWeight: "⚖️ 麵糰總重預估",
-        copyGuideHeader: "🔥【鑄鐵鍋烘焙步驟】",
-        copyStep1: "1. 預熱：連蓋放入烤箱 230°C–250°C (450°F–480°F) 預熱 45–60 分鐘。",
-        copyStep2: "2. 有蓋烘烤：麵糰劃刀後入鍋，蓋蓋 230°C (450°F) 烤 20 分鐘（可放1-2顆冰塊增強蒸汽）。",
-        copyStep3: "3. 無蓋烘烤：開蓋，降溫至 200°C–210°C (400°F–410°F) 續烤 20–25 分鐘上色。",
+        copyGuideHeaderDutch: "🔥【鑄鐵鍋烘焙步驟】",
+        copyGuideHeaderStone: "🔥【披薩石板加鍋蓋烘焙步驟】",
+        copyGuideHeaderAirFryer: "🔥【空氣炸鍋烘焙步驟】",
+        copyGuideHeaderBreadMachine: "🔥【麵包機烘焙步驟】",
+        copyStep1Dutch: "1. 預熱：連蓋放入烤箱 230°C–250°C (450°F–480°F) 預熱 45–60 分鐘。",
+        copyStep2Dutch: "2. 有蓋烘烤：麵糰劃刀後入鍋，蓋蓋 230°C (450°F) 烤 20 分鐘（可放1-2顆冰塊增強蒸汽）。",
+        copyStep3Dutch: "3. 無蓋烘烤：開蓋，降溫至 200°C–210°C (400°F–410°F) 續烤 20–25 分鐘上色。",
+        copyStep1Stone: "1. 預熱：石板及深鍋蓋放入烤箱 230°C–250°C (450°F–480°F) 預熱 45–60 分鐘。",
+        copyStep2Stone: "2. 罩蓋烘烤：麵糰移至熱石板，噴水加濕後蓋上深鍋蓋 230°C (450°F) 烤 20 分鐘。",
+        copyStep3Stone: "3. 移蓋烘烤：取下深鍋蓋，降溫至 200°C–210°C (400°F–410°F) 續烤 20–25 分鐘上色。",
+        copyStep1AirFryer: "1. 預熱：氣炸鍋以最高溫 200°C (390°F) 預熱 10–15 分鐘。",
+        copyStep2AirFryer: "2. 罩蓋蒸烤：麵糰放入氣炸籃噴水，用高拱形錫紙或蓋子密封包覆，200°C 烤 20–25 分鐘。",
+        copyStep3AirFryer: "3. 移蓋上色：小心移除錫紙罩，降溫至 170°C–180°C 續烤 15–20 分鐘至金黃酥脆。",
+        copyStep1BreadMachine: "1. 攪拌：材料放入內膽，選擇自主揉麵模式 10–15 分鐘（可拆除攪拌槳）。",
+        copyStep2BreadMachine: "2. 發酵：使用天然酵母/發酵模式靜置發酵 2–4 小時至 1.5-2 倍大。",
+        copyStep3BreadMachine: "3. 烘烤：啟動獨立「烘烤 (Bake Only)」模式，深烤色烘烤 35–45 分鐘。",
         copyStep4: "4. 冷卻：移至網架上冷卻 1–2 小時後切片。"
       },
       en: {
-        badgeTag: "Golden Ratio Sourdough",
-        mainTitle: "Sourdough Calculator",
-        subTitle: "Easily calculate perfect sourdough bread recipes and control dough hydration with precision.",
-        inputSectionTitle: "Flour Weight & Hydration",
-        flourLabel: "Total Flour Weight",
-        flourBaseNote: "[Base 100%]",
-        baseBadge: "Base",
-        gramUnit: "grams (g)",
-        preset1: "1 Loaf (300g)",
-        preset2: "Standard (500g)",
-        preset3: "Large (1000g)",
-        hydrationLabel: "Water Hydration",
-        hydNote1: "60% (Easy to handle)",
-        hydNote2: "75% (Classic High Hydration)",
-        hydNote3: "90% (Open Crumb)",
-        softenerToggleLabel: '<i class="fa-solid fa-cookie-bite text-rust"></i> Add Softening Ingredients',
-        softenerToggleSub: "Add natural sugar/honey and oil for a softer crumb",
-        tipsTitle: "Sourdough Pro Tips",
-        tipsContent: "• <strong>Starter Ratio (25%):</strong> Standard baker's percentage calculation.<br>• <strong>Flour Blend:</strong> 75% Bread Flour builds strong gluten structure; 25% Whole Wheat adds deep nutty flavor.<br>• <strong>Softening Agents:</strong> Adding sugar and oil extends freshness and makes sandwich loaves ultra-soft.",
-        recipeTitle: "Sourdough Recipe Breakdown",
-        recipeSubTitle: "Sourdough Bread Recipe",
-        copyBtnText: "Copy Recipe & Baking Guide",
-        copiedBtnText: "Copied!",
-        basicIngrTitle: "Main Dough Base Ingredients",
-        starterName: "Sourdough Starter <span class=\"text-xs font-normal text-gray-500\">酸種酵母</span>",
-        starterRatio: "Ratio: 25%",
-        breadFlourName: "Bread Flour <span class=\"text-xs font-normal text-gray-500\">高筋麵粉</span>",
-        breadFlourRatio: "Ratio: 75%",
-        wholeWheatName: "Whole Wheat Flour <span class=\"text-xs font-normal text-gray-500\">全麥麵粉</span>",
-        wholeWheatRatio: "Ratio: 25%",
-        waterName: "Water <span class=\"text-xs font-normal text-gray-500\">水</span>",
-        waterRatioLabel: "Hydration:",
-        saltName: "Salt <span class=\"text-xs font-normal text-gray-500\">鹽</span>",
-        saltRatio: "Ratio: 2.0%",
-        softenerTitle: "Optional Softening Ingredients",
-        softenerSub: "(For a soft & tender crumb)",
-        sugarName: "Natural Sugar or Honey <span class=\"text-[11px] text-gray-500\">天然糖 / 蜂蜜</span>",
-        sugarRatio: "Ratio: 7.5%",
-        oilName: "Oil / Fat <span class=\"text-[11px] text-gray-500\">(Vegetable Oil or Butter 油脂)</span>",
-        oilRatio: "Ratio: 5.0%",
+        appSubtitleHeader: "ARTISAN BREAD UTILITY",
+        appTitle: "Sourdough Recipe Calculator",
+        appSubtitle: "Golden Ratios • Precise Hydration • Artisan Texture",
+        flourInputLabel: "Total Flour Amount",
+        flourSliderLabel: "Common Flour Amounts",
+        hydrationLabel: "Hydration Ratio",
+        softenerToggleOn: "Softening Ingredients Included (Sugar & Oil)",
+        softenerToggleOff: "Softening Ingredients Excluded (Click to Add)",
+        toggleActionBtn: "Toggle Option",
+        recipeTitle: "Recipe Ingredient Breakdown",
+        autoCalcNote: "Instant Calculation",
+        colIngredient: "Ingredient",
+        colPercentage: "Percentage (%)",
+        colWeight: "Weight (g)",
+        ingStarter: "Sourdough Starter",
+        ingBreadFlour: "Bread Flour",
+        ingWholeWheat: "Whole Wheat Flour",
+        ingWater: "Water Amount",
+        waterDeductionNote: "(Calculated Water - 20g for Hand Moisture)",
+        ingSalt: "Sea Salt",
+        softenerHeader: "Softening Ingredients Option (For Softer Bread)",
+        ingSugar: "Natural Sugar / Honey",
+        ingOil: "Vegetable Oil / Butter",
         totalDoughLabel: "Est. Total Dough Weight",
-        dutchGuideTitle: "Dutch Oven Pre-heating & Baking Guide",
-        dutchBadge: "4-Step Success",
+        copyBtnText: "Copy Full Recipe to Clipboard",
+        copiedBtnText: "✓ Recipe Copied Successfully!",
+        bakingGuideTitle: "Baking Guide & Instructions",
+        methodDutch: "Dutch Oven",
+        methodStone: "Pizza Stone + Dome",
+        methodAirFryer: "Air Fryer",
+        methodBreadMachine: "Bread Machine",
         step1Header: "PRE-HEATING",
-        step1Title: "Preheat Dutch Oven",
-        step1Desc: 'Place the Dutch oven (with lid) on the middle rack. Preheat oven to <strong class="text-amber-900">230°C–250°C (450°F–480°F)</strong> for <strong class="text-amber-900">45–60 mins</strong>.',
-        step2Header: "LIDDED BAKING (STEAM)",
-        step2Title: "Score & Load (20 mins)",
-        step2Desc: 'Score dough and load on parchment paper. Add 1-2 ice cubes for extra steam. Bake with lid ON at <strong class="text-amber-900">230°C (450°F)</strong> for <strong class="text-amber-900">20 mins</strong>.',
-        step3Header: "UNLIDDED BAKING (CRUST)",
-        step3Title: "Bake Uncovered (20-25 mins)",
-        step3Desc: 'Remove lid carefully. Lower temp to <strong class="text-amber-900">200°C–210°C (400°F–410°F)</strong> and bake uncovered for <strong class="text-amber-900">20–25 mins</strong> until deep golden brown.',
+        step1TitleDutch: "Preheat Dutch Oven",
+        step1DescDutch: 'Place Dutch oven (with lid) on rack. Preheat to <strong class="text-amber-900">230°C–250°C (450°F–480°F)</strong> for <strong class="text-amber-900">45–60 mins</strong>.',
+        step2Header: "COVERED BAKING (STEAM)",
+        step2TitleDutch: "Score & Load (20 mins)",
+        step2DescDutch: 'Score dough and load in pot. Add 1-2 ice cubes for extra steam. Cover lid and bake at <strong class="text-amber-900">230°C (450°F)</strong> for <strong class="text-amber-900">20 mins</strong>.',
+        step3Header: "UNCOVERED BAKING (CRUST)",
+        step3TitleDutch: "Bake Uncovered (20-25 mins)",
+        step3DescDutch: 'Remove lid carefully. Lower temp to <strong class="text-amber-900">200°C–210°C (400°F–410°F)</strong> and bake uncovered for <strong class="text-amber-900">20–25 mins</strong>.',
+        step1TitleStone: "Preheat Stone & Metal Dome",
+        step1DescStone: 'Place pizza stone on lower rack with an inverted deep metal pot/bowl cover. Preheat to <strong class="text-amber-900">230°C–250°C (450°F–480°F)</strong> for <strong class="text-amber-900">45–60 mins</strong>.',
+        step2TitleStone: "Transfer & Cover (20 mins)",
+        step2DescStone: 'Transfer scored dough to hot stone, spritz water/ice cubes near edges, and quickly cover with deep dome. Bake at <strong class="text-amber-900">230°C (450°F)</strong> for <strong class="text-amber-900">20 mins</strong>.',
+        step3TitleStone: "Remove Dome & Bake (20-25 mins)",
+        step3DescStone: 'Carefully remove metal dome. Lower oven temp to <strong class="text-amber-900">200°C–210°C (400°F–410°F)</strong> and bake uncovered for <strong class="text-amber-900">20–25 mins</strong>.',
+        step1TitleAirFryer: "Preheat Air Fryer High Temp",
+        step1DescAirFryer: 'Preheat empty air fryer to <strong class="text-amber-900">200°C (390°F)</strong> for <strong class="text-amber-900">10–15 mins</strong>. (Recommended smaller batch size: 250g–350g total flour to fit interior basket).',
+        step2TitleAirFryer: "Covered Foil Dome Steam (20-25 mins)",
+        step2DescAirFryer: 'Place scored dough on parchment paper in basket, spritz water, and cover dough with a high domed foil tent/lid. Bake at <strong class="text-amber-900">190°C–200°C</strong> for <strong class="text-amber-900">20–25 mins</strong>.',
+        step3TitleAirFryer: "Remove Foil & Brown Crust (15-20 mins)",
+        step3DescAirFryer: 'Carefully remove top foil dome. Lower temp to <strong class="text-amber-900">170°C–180°C (340°F–350°F)</strong> and bake for <strong class="text-amber-900">15–20 mins</strong> until deep golden brown.',
+        step1TitleBreadMachine: "Mixing & Kneading (10-15 mins)",
+        step1DescBreadMachine: 'Add ingredients to bread pan. Run knead/dough cycle for <strong class="text-amber-900">10–15 mins</strong> until dough forms. (Remove paddle after kneading if desired).',
+        step2TitleBreadMachine: "Fermentation (2-4 hours)",
+        step2DescBreadMachine: 'Use sourdough/ferment mode or leave machine off to ferment dough for <strong class="text-amber-900">2–4 hours</strong> until expanded by 1.5–2x.',
+        step3TitleBreadMachine: "Bake Only Mode (35-45 mins)",
+        step3DescBreadMachine: 'Select "Bake Only" mode with Dark Crust setting. Bake for <strong class="text-amber-900">35–45 mins</strong> until top forms a firm golden crust.',
         step4Header: "COOLING",
-        step4Title: "Cool on Wire Rack",
-        step4Desc: 'Transfer to a wire rack and let cool completely for <strong class="text-amber-900">1–2 hours</strong> before slicing to allow internal moisture to set.',
+        step4TitleDutch: "Cool on Wire Rack",
+        step4DescDutch: 'Transfer to a wire rack and let cool completely for <strong class="text-amber-900">1–2 hours</strong> before slicing.',
         footerText: "© Sourdough Companion • Artisan Bread Baking Utility",
         copyTitleText: "【Sourdough Bread Recipe】",
         copyFlourBase: "Total Flour Base",
         copySoftenerHeader: "[Softening Ingredients Option]",
         copyTotalWeight: "⚖️ Est. Total Dough Weight",
-        copyGuideHeader: "🔥【Dutch Oven Baking Guide】",
-        copyStep1: "1. Pre-heat: Preheat Dutch oven (with lid) at 230°C–250°C (450°F–480°F) for 45–60 mins.",
-        copyStep2: "2. Lidded Bake: Score dough, put in pot, cover lid, bake at 230°C (450°F) for 20 mins.",
-        copyStep3: "3. Unlidded Bake: Remove lid, bake at 200°C–210°C (400°F–410°F) for 20–25 mins for deep golden crust.",
+        copyGuideHeaderDutch: "🔥【Dutch Oven Baking Guide】",
+        copyGuideHeaderStone: "🔥【Pizza Stone + Dome Cover Guide】",
+        copyGuideHeaderAirFryer: "🔥【Air Fryer Baking Guide】",
+        copyGuideHeaderBreadMachine: "🔥【Bread Machine Baking Guide】",
+        copyStep1Dutch: "1. Pre-heat: Preheat Dutch oven (with lid) at 230°C–250°C (450°F–480°F) for 45–60 mins.",
+        copyStep2Dutch: "2. Lidded Bake: Score dough, put in pot, cover lid, bake at 230°C (450°F) for 20 mins.",
+        copyStep3Dutch: "3. Unlidded Bake: Remove lid, bake at 200°C–210°C (400°F–410°F) for 20–25 mins for deep golden crust.",
+        copyStep1Stone: "1. Pre-heat: Preheat Pizza stone & dome cover at 230°C–250°C (450°F–480°F) for 45–60 mins.",
+        copyStep2Stone: "2. Domed Bake: Transfer dough onto stone, cover with metal dome, bake at 230°C (450°F) for 20 mins.",
+        copyStep3Stone: "3. Uncovered Bake: Remove dome, lower temp to 200°C–210°C (400°F–410°F) for 20–25 mins for deep golden crust.",
+        copyStep1AirFryer: "1. Pre-heat: Preheat Air Fryer to 200°C (390°F) for 10–15 mins.",
+        copyStep2AirFryer: "2. Domed Foil Bake: Place dough in basket, cover with foil tent, bake at 190°C–200°C for 20–25 mins.",
+        copyStep3AirFryer: "3. Uncovered Bake: Remove foil dome, lower temp to 170°C–180°C for 15–20 mins to crisp crust.",
+        copyStep1BreadMachine: "1. Knead: Load ingredients into pan, run knead cycle for 10–15 mins (remove paddle after kneading).",
+        copyStep2BreadMachine: "2. Ferment: Ferment in machine for 2–4 hours until expanded 1.5–2x.",
+        copyStep3BreadMachine: "3. Bake: Run 'Bake Only' mode on Dark Crust setting for 35–45 mins.",
         copyStep4: "4. Cool: Rest on wire rack for 1–2 hours before slicing."
       }
     };
 
+    // State Variables
     let currentLang = 'zh';
+    let includeSofteners = true;
+    let bakingMethod = 'dutch'; // 'dutch', 'stone', 'airfryer', or 'breadmachine'
+
+    // Baker's Ratios (%)
+    const RATIOS = {
+      starter: 0.25,
+      breadFlour: 0.75,
+      wholeWheat: 0.25,
+      salt: 0.02,
+      sugar: 0.075,
+      oil: 0.05
+    };
+
+    const FLOUR_PRESETS = [200, 300, 400, 500, 700, 800, 900, 1000, 1250, 1500];
+
+    // DOM Element Selector Helper
+    function getElements() {
+      return {
+        flourInput: document.getElementById('flourInput'),
+        flourSlider: document.getElementById('flourSlider'),
+        flourSliderDisplay: document.getElementById('flourSliderDisplay'),
+        waterSlider: document.getElementById('waterSlider'),
+        waterPercentDisplay: document.getElementById('waterPercentDisplay'),
+        waterTablePercent: document.getElementById('waterTablePercent'),
+        starterGrams: document.getElementById('starterGrams'),
+        breadFlourGrams: document.getElementById('breadFlourGrams'),
+        wholeWheatGrams: document.getElementById('wholeWheatGrams'),
+        waterGrams: document.getElementById('waterGrams'),
+        saltGrams: document.getElementById('saltGrams'),
+        sugarGrams: document.getElementById('sugarGrams'),
+        oilGrams: document.getElementById('oilGrams'),
+        totalDoughWeight: document.getElementById('totalDoughWeight'),
+        softenerSection: document.getElementById('softenerSection'),
+        softenerToggleBtn: document.getElementById('softenerToggleBtn'),
+        softenerToggleText: document.getElementById('softenerToggleText'),
+        step1Title: document.getElementById('step1Title'),
+        step1Desc: document.getElementById('step1Desc'),
+        step2Title: document.getElementById('step2Title'),
+        step2Desc: document.getElementById('step2Desc'),
+        step3Title: document.getElementById('step3Title'),
+        step3Desc: document.getElementById('step3Desc'),
+        methodDutchBtn: document.getElementById('methodDutchBtn'),
+        methodStoneBtn: document.getElementById('methodStoneBtn'),
+        methodAirFryerBtn: document.getElementById('methodAirFryerBtn'),
+        methodBreadMachineBtn: document.getElementById('methodBreadMachineBtn')
+      };
+    }
+
+    function setBakingMethod(method) {
+      bakingMethod = method;
+      const els = getElements();
+
+      const activeClass = "px-3 py-1.5 rounded-lg text-xs font-bold transition-all bg-amber-800 text-amber-50 shadow";
+      const inactiveClass = "px-3 py-1.5 rounded-lg text-xs font-bold transition-all text-amber-900 hover:bg-amber-200/60";
+
+      if (els.methodDutchBtn) els.methodDutchBtn.className = method === 'dutch' ? activeClass : inactiveClass;
+      if (els.methodStoneBtn) els.methodStoneBtn.className = method === 'stone' ? activeClass : inactiveClass;
+      if (els.methodAirFryerBtn) els.methodAirFryerBtn.className = method === 'airfryer' ? activeClass : inactiveClass;
+      if (els.methodBreadMachineBtn) els.methodBreadMachineBtn.className = method === 'breadmachine' ? activeClass : inactiveClass;
+
+      updateBakingMethodText();
+    }
+
+    function updateBakingMethodText() {
+      const els = getElements();
+      const dict = i18n[currentLang];
+
+      if (bakingMethod === 'dutch') {
+        if (els.step1Title) els.step1Title.innerHTML = dict.step1TitleDutch;
+        if (els.step1Desc) els.step1Desc.innerHTML = dict.step1DescDutch;
+        if (els.step2Title) els.step2Title.innerHTML = dict.step2TitleDutch;
+        if (els.step2Desc) els.step2Desc.innerHTML = dict.step2DescDutch;
+        if (els.step3Title) els.step3Title.innerHTML = dict.step3TitleDutch;
+        if (els.step3Desc) els.step3Desc.innerHTML = dict.step3DescDutch;
+      } else if (bakingMethod === 'stone') {
+        if (els.step1Title) els.step1Title.innerHTML = dict.step1TitleStone;
+        if (els.step1Desc) els.step1Desc.innerHTML = dict.step1DescStone;
+        if (els.step2Title) els.step2Title.innerHTML = dict.step2TitleStone;
+        if (els.step2Desc) els.step2Desc.innerHTML = dict.step2DescStone;
+        if (els.step3Title) els.step3Title.innerHTML = dict.step3TitleStone;
+        if (els.step3Desc) els.step3Desc.innerHTML = dict.step3DescStone;
+      } else if (bakingMethod === 'airfryer') {
+        if (els.step1Title) els.step1Title.innerHTML = dict.step1TitleAirFryer;
+        if (els.step1Desc) els.step1Desc.innerHTML = dict.step1DescAirFryer;
+        if (els.step2Title) els.step2Title.innerHTML = dict.step2TitleAirFryer;
+        if (els.step2Desc) els.step2Desc.innerHTML = dict.step2DescAirFryer;
+        if (els.step3Title) els.step3Title.innerHTML = dict.step3TitleAirFryer;
+        if (els.step3Desc) els.step3Desc.innerHTML = dict.step3DescAirFryer;
+      } else if (bakingMethod === 'breadmachine') {
+        if (els.step1Title) els.step1Title.innerHTML = dict.step1TitleBreadMachine;
+        if (els.step1Desc) els.step1Desc.innerHTML = dict.step1DescBreadMachine;
+        if (els.step2Title) els.step2Title.innerHTML = dict.step2TitleBreadMachine;
+        if (els.step2Desc) els.step2Desc.innerHTML = dict.step2DescBreadMachine;
+        if (els.step3Title) els.step3Title.innerHTML = dict.step3TitleBreadMachine;
+        if (els.step3Desc) els.step3Desc.innerHTML = dict.step3DescBreadMachine;
+      }
+    }
 
     function setLanguage(lang) {
       currentLang = lang;
@@ -656,7 +724,7 @@
         langZhBtn.className = "px-3 py-1 rounded-lg transition-all text-amber-300/70 hover:text-amber-100";
       }
 
-      // Update all data-i18n elements
+      // Translate DOM elements marked with data-i18n
       document.querySelectorAll('[data-i18n]').forEach(el => {
         const key = el.getAttribute('data-i18n');
         if (i18n[lang][key]) {
@@ -664,139 +732,156 @@
         }
       });
 
+      updateSoftenerToggleText();
+      updateBakingMethodText();
       calculateRecipe();
     }
 
-    // DOM Elements
-    const flourInput = document.getElementById('flourInput');
-    const waterSlider = document.getElementById('waterSlider');
-    const waterPercentDisplay = document.getElementById('waterPercentDisplay');
-    const waterPercentTag = document.getElementById('waterPercentTag');
-    const softenerSection = document.getElementById('softenerSection');
-    const softenerToggleBtn = document.getElementById('softenerToggleBtn');
-    const softenerToggleDot = document.getElementById('softenerToggleDot');
+    function syncFlourFromSlider(sliderIdx) {
+      const els = getElements();
+      if (!els.flourInput) return;
+      const val = FLOUR_PRESETS[parseInt(sliderIdx)];
+      els.flourInput.value = val;
+      if (els.flourSliderDisplay) els.flourSliderDisplay.textContent = `${val}g`;
+      calculateRecipe();
+    }
 
-    // Softener Toggle State
-    let includeSofteners = false;
+    function syncFlourFromInput() {
+      const els = getElements();
+      if (!els.flourInput || !els.flourSlider) return;
+      const currentVal = parseFloat(els.flourInput.value) || 0;
+
+      let closestIdx = 0;
+      let minDiff = Math.abs(currentVal - FLOUR_PRESETS[0]);
+
+      for (let i = 1; i < FLOUR_PRESETS.length; i++) {
+        const diff = Math.abs(currentVal - FLOUR_PRESETS[i]);
+        if (diff < minDiff) {
+          minDiff = diff;
+          closestIdx = i;
+        }
+      }
+
+      els.flourSlider.value = closestIdx;
+      if (els.flourSliderDisplay) els.flourSliderDisplay.textContent = `${currentVal}g`;
+      calculateRecipe();
+    }
 
     function toggleSofteners() {
       includeSofteners = !includeSofteners;
+      const els = getElements();
+      if (!els.softenerSection || !els.softenerToggleBtn) return;
       
       if (includeSofteners) {
-        softenerToggleBtn.classList.replace('bg-gray-300', 'bg-amber-600');
-        softenerToggleDot.classList.replace('translate-x-0', 'translate-x-5');
-        softenerSection.classList.remove('hidden');
+        els.softenerSection.classList.remove('hidden');
+        els.softenerToggleBtn.classList.replace('bg-stone-400', 'bg-amber-800');
+        els.softenerToggleBtn.classList.replace('hover:bg-stone-500', 'hover:bg-amber-900');
       } else {
-        softenerToggleBtn.classList.replace('bg-amber-600', 'bg-gray-300');
-        softenerToggleDot.classList.replace('translate-x-5', 'translate-x-0');
-        softenerSection.classList.add('hidden');
+        els.softenerSection.classList.add('hidden');
+        els.softenerToggleBtn.classList.replace('bg-amber-800', 'bg-stone-400');
+        els.softenerToggleBtn.classList.replace('hover:bg-amber-900', 'hover:bg-stone-500');
       }
-      
+
+      updateSoftenerToggleText();
       calculateRecipe();
     }
 
-    // Gram Outputs
-    const starterGrams = document.getElementById('starterGrams');
-    const breadFlourGrams = document.getElementById('breadFlourGrams');
-    const wholeWheatGrams = document.getElementById('wholeWheatGrams');
-    const waterGrams = document.getElementById('waterGrams');
-    const saltGrams = document.getElementById('saltGrams');
-    const sugarGrams = document.getElementById('sugarGrams');
-    const oilGrams = document.getElementById('oilGrams');
-    const totalDoughWeight = document.getElementById('totalDoughWeight');
-
-    // Percentage Constants based on requirement
-    const RATIOS = {
-      starter: 0.25,      // 25%
-      breadFlour: 0.75,   // 75%
-      wholeWheat: 0.25,   // 25%
-      salt: 0.02,         // 2%
-      sugar: 0.075,       // 7.5%
-      oil: 0.05           // 5.0%
-    };
-
-    // Calculate recipe values dynamically
-    function calculateRecipe() {
-      let flour = parseFloat(flourInput.value);
-      
-      // Sanitize input
-      if (isNaN(flour) || flour <= 0) {
-        flour = 0;
-      }
-
-      const waterPercent = parseInt(waterSlider.value, 10);
-
-      // Calculations
-      const starter = flour * RATIOS.starter;
-      const breadFlour = flour * RATIOS.breadFlour;
-      const wholeWheat = flour * RATIOS.wholeWheat;
-      const water = flour * (waterPercent / 100);
-      const salt = flour * RATIOS.salt;
-      const sugar = flour * RATIOS.sugar;
-      const oil = flour * RATIOS.oil;
-
-      // Calculate total weight based on softener toggle state
-      const total = starter + breadFlour + wholeWheat + water + salt + (includeSofteners ? (sugar + oil) : 0);
-
-      // Update UI displays
-      waterPercentDisplay.textContent = waterPercent + '%';
-      waterPercentTag.textContent = waterPercent + '%';
-
-      starterGrams.textContent = formatNumber(starter);
-      breadFlourGrams.textContent = formatNumber(breadFlour);
-      wholeWheatGrams.textContent = formatNumber(wholeWheat);
-      waterGrams.textContent = formatNumber(water);
-      saltGrams.textContent = formatNumber(salt);
-      sugarGrams.textContent = formatNumber(sugar);
-      oilGrams.textContent = formatNumber(oil);
-      totalDoughWeight.textContent = formatNumber(total);
-    }
-
-    // Number formatting helper
-    function formatNumber(num) {
-      return Number.isInteger(num) ? num.toString() : num.toFixed(1);
-    }
-
-    // Quick Flour Presets
-    function setFlour(amount) {
-      flourInput.value = amount;
-      calculateRecipe();
-    }
-
-    // Event Listeners
-    flourInput.addEventListener('input', calculateRecipe);
-    waterSlider.addEventListener('input', calculateRecipe);
-
-    // Copy Recipe Functionality (Bilingual aware)
-    function copyRecipe() {
-      const flour = flourInput.value || 0;
-      const waterPercent = waterSlider.value;
+    function updateSoftenerToggleText() {
+      const els = getElements();
+      if (!els.softenerToggleText) return;
       const dict = i18n[currentLang];
+      els.softenerToggleText.textContent = includeSofteners ? dict.softenerToggleOn : dict.softenerToggleOff;
+    }
+
+    function calculateRecipe() {
+      const els = getElements();
+      if (!els.flourInput || !els.waterSlider) return;
+
+      const flour = Math.max(0, parseFloat(els.flourInput.value) || 0);
+      const hydration = parseFloat(els.waterSlider.value) || 65;
+
+      if (els.waterPercentDisplay) els.waterPercentDisplay.textContent = `${hydration}%`;
+      if (els.waterTablePercent) els.waterTablePercent.textContent = `${hydration}%`;
+
+      const starter = Math.round(flour * RATIOS.starter);
+      const breadFlour = Math.round(flour * RATIOS.breadFlour);
+      const wholeWheat = Math.round(flour * RATIOS.wholeWheat);
+      
+      // Calculate water with 20g hand moisture deduction
+      const rawWater = Math.round(flour * (hydration / 100));
+      const adjustedWater = Math.max(0, rawWater - 20);
+      
+      const salt = Math.round(flour * RATIOS.salt);
+      const sugar = Math.round(flour * RATIOS.sugar);
+      const oil = Math.round(flour * RATIOS.oil);
+
+      if (els.starterGrams) els.starterGrams.textContent = starter;
+      if (els.breadFlourGrams) els.breadFlourGrams.textContent = breadFlour;
+      if (els.wholeWheatGrams) els.wholeWheatGrams.textContent = wholeWheat;
+      if (els.waterGrams) els.waterGrams.textContent = adjustedWater;
+      if (els.saltGrams) els.saltGrams.textContent = salt;
+      if (els.sugarGrams) els.sugarGrams.textContent = sugar;
+      if (els.oilGrams) els.oilGrams.textContent = oil;
+
+      let total = starter + breadFlour + wholeWheat + adjustedWater + salt;
+      if (includeSofteners) {
+        total += sugar + oil;
+      }
+      if (els.totalDoughWeight) els.totalDoughWeight.textContent = total;
+    }
+
+    function copyRecipe() {
+      const els = getElements();
+      const flour = els.flourInput ? els.flourInput.value : 0;
+      const waterPercent = els.waterSlider ? els.waterSlider.value : 65;
+      const dict = i18n[currentLang];
+      
+      let guideHeader = dict.copyGuideHeaderDutch;
+      let s1 = dict.copyStep1Dutch;
+      let s2 = dict.copyStep2Dutch;
+      let s3 = dict.copyStep3Dutch;
+
+      if (bakingMethod === 'stone') {
+        guideHeader = dict.copyGuideHeaderStone;
+        s1 = dict.copyStep1Stone;
+        s2 = dict.copyStep2Stone;
+        s3 = dict.copyStep3Stone;
+      } else if (bakingMethod === 'airfryer') {
+        guideHeader = dict.copyGuideHeaderAirFryer;
+        s1 = dict.copyStep1AirFryer;
+        s2 = dict.copyStep2AirFryer;
+        s3 = dict.copyStep3AirFryer;
+      } else if (bakingMethod === 'breadmachine') {
+        guideHeader = dict.copyGuideHeaderBreadMachine;
+        s1 = dict.copyStep1BreadMachine;
+        s2 = dict.copyStep2BreadMachine;
+        s3 = dict.copyStep3BreadMachine;
+      }
       
       let recipeText = `${dict.copyTitleText} (${dict.copyFlourBase}: ${flour}g)
 ----------------------------------
-🍞 ${currentLang === 'zh' ? '酸種酵母 (25%)' : 'Sourdough Starter (25%)'}: ${starterGrams.textContent} g
-🌾 ${currentLang === 'zh' ? '高筋麵包麵粉 (75%)' : 'Bread Flour (75%)'}: ${breadFlourGrams.textContent} g
-🌾 ${currentLang === 'zh' ? '全麥麵粉 (25%)' : 'Whole Wheat Flour (25%)'}: ${wholeWheatGrams.textContent} g
-💧 ${currentLang === 'zh' ? '水' : 'Water'} (${waterPercent}%): ${waterGrams.textContent} g
-🧂 ${currentLang === 'zh' ? '鹽 (2%)' : 'Salt (2%)'}: ${saltGrams.textContent} g`;
+🍞 ${currentLang === 'zh' ? '酸種酵母 (25%)' : 'Sourdough Starter (25%)'}: ${els.starterGrams.textContent} g
+🌾 ${currentLang === 'zh' ? '高筋麵包麵粉 (75%)' : 'Bread Flour (75%)'}: ${els.breadFlourGrams.textContent} g
+🌾 ${currentLang === 'zh' ? '全麥麵粉 (25%)' : 'Whole Wheat Flour (25%)'}: ${els.wholeWheatGrams.textContent} g
+💧 ${currentLang === 'zh' ? '水量' : 'Water'} (${waterPercent}% - 20g): ${els.waterGrams.textContent} g
+🧂 ${currentLang === 'zh' ? '鹽 (2%)' : 'Salt (2%)'}: ${els.saltGrams.textContent} g`;
 
       if (includeSofteners) {
         recipeText += `
 ----------------------------------
 ${dict.copySoftenerHeader}
-🍯 ${currentLang === 'zh' ? '天然糖或蜂蜜 (7.5%)' : 'Natural Sugar / Honey (7.5%)'}: ${sugarGrams.textContent} g
-🧈 ${currentLang === 'zh' ? '油脂 (5.0%)' : 'Oil / Fat (5.0%)'}: ${oilGrams.textContent} g`;
+🍯 ${currentLang === 'zh' ? '天然糖或蜂蜜 (7.5%)' : 'Natural Sugar / Honey (7.5%)'}: ${els.sugarGrams.textContent} g
+🧈 ${currentLang === 'zh' ? '油脂 (5.0%)' : 'Oil / Fat (5.0%)'}: ${els.oilGrams.textContent} g`;
       }
 
       recipeText += `
 ----------------------------------
-${dict.copyTotalWeight}: ${totalDoughWeight.textContent} g
+${dict.copyTotalWeight}: ${els.totalDoughWeight.textContent} g
 
-${dict.copyGuideHeader}
-${dict.copyStep1}
-${dict.copyStep2}
-${dict.copyStep3}
+${guideHeader}
+${s1}
+${s2}
+${s3}
 ${dict.copyStep4}`;
 
       const tempTextArea = document.createElement('textarea');
@@ -824,7 +909,7 @@ ${dict.copyStep4}`;
       }
     }
 
-    // Initial calculation on page load
+    // Run calculation once DOM loads
     window.onload = function() {
       calculateRecipe();
     };
